@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     environment:
       MONGO_INITDB_DATABASE: voltaire
+    ports:
+      - "27017:27017"
     volumes:
       - mongo_data:/data/db
     networks:
