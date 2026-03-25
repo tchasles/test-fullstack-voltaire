@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 
 const authRoutes = require('./routes/auth');
 const protectedRoutes = require('./routes/protected');
+const produitRoutes = require('./routes/produit');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,6 +18,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api', protectedRoutes);
+app.use('/api/produit', produitRoutes);
 
 // Health check
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
