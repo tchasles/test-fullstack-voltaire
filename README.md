@@ -26,7 +26,32 @@ cp .env.example .env   # then edit JWT_SECRET
 docker compose up --build
 ```
 
-The application will be available at **http://localhost**.
+The application will be available at **http://localhost/login**.
+
+## Seed produit data on first run
+
+MongoDB can import initial `produit` documents from `mongo-init/seed.produit.json` the first time the `mongo_data` volume is created.
+
+1. Put your records in `mongo-init/seed.produit.json`.
+2. Start the stack with `docker compose up -d --build`.
+3. If Mongo has already been initialized, rerun with a fresh volume: `docker compose down -v` then `docker compose up -d --build`.
+
+Expected JSON format:
+
+```json
+[
+    {
+        "id": 1,
+        "name": "Produit A",
+        "category": "Informatique",
+        "price": 99.99,
+        "stock": 25,
+        "created_at": "2026-03-25T00:00:00.000Z"
+    }
+]
+```
+
+The seed script inserts documents into the `produit` collection and creates a unique index on `id`.
 
 ## Environment variables (backend)
 
