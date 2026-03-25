@@ -1,0 +1,46 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: voltaire_mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: voltaire
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - voltaire_net
+
+  backend:
+    build:
+      context: ./backend
+    container_name: voltaire_backend
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      PORT: 5000
+      MONGO_URI: mongodb://mongo:27017/voltaire
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      CORS_ORIGIN: http://localhost:80
+    networks:
+      - voltaire_net
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: voltaire_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - voltaire_net
+
+volumes:
+  mongo_data:
+
+networks:
+  voltaire_net:
+    driver: bridge

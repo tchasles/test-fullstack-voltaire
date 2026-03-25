@@ -1,0 +1,178 @@
+/* ─── Reset & Base ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #f0f2f5;
+  color: #1a1a2e;
+  min-height: 100vh;
+}
+
+/* ─── Auth Pages ────────────────────────────────────────────────── */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.auth-form {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.auth-form h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  color: #16213e;
+}
+
+.auth-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.auth-form input {
+  padding: 0.65rem 0.85rem;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.auth-form input:focus {
+  border-color: #4f8ef7;
+}
+
+.auth-form button[type="submit"] {
+  padding: 0.75rem;
+  background: #4f8ef7;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.auth-form button[type="submit"]:hover:not(:disabled) {
+  background: #3a78e0;
+}
+
+.auth-form button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-form p {
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.auth-form a {
+  color: #4f8ef7;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.error {
+  background: #fff0f0;
+  color: #d32f2f;
+  border: 1px solid #ffcdd2;
+  border-radius: 6px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.875rem;
+}
+
+/* ─── Dashboard ─────────────────────────────────────────────────── */
+.dashboard {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-header {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-header h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #16213e;
+}
+
+.logout-btn {
+  padding: 0.5rem 1.2rem;
+  background: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.logout-btn:hover {
+  background: #c62828;
+}
+
+.dashboard-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 3rem 1rem;
+}
+
+.welcome-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem 2rem;
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.welcome-card h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #16213e;
+}
+
+.welcome-card p {
+  color: #555;
+  line-height: 1.6;
+}
+
+/* ─── Loading ───────────────────────────────────────────────────── */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 1.1rem;
+  color: #888;
+}
