@@ -4,6 +4,22 @@ const API_URL = '/api';
 
 const TOKEN_KEY = 'voltaire_token';
 
+// Axios instance with auth headers
+const api = axios.create({
+  baseURL: API_URL,
+});
+
+// Add token to all requests
+api.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export { api };
+
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY);
 }
