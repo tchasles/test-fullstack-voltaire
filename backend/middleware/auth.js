@@ -4,8 +4,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'change-this-secret-in-production';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 /**
- * Verify JWT token sent in the Authorization header (Bearer scheme).
- * Attaches the decoded payload to req.user on success.
+ * Verifie le jeton JWT envoye dans l'en-tete Authorization (schema Bearer).
+ * Attache la charge utile decodee a req.user en cas de succes.
  */
 function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;

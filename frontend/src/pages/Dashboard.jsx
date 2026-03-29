@@ -13,7 +13,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch categories on mount
+  // Charge les categories au montage du composant
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -28,7 +28,7 @@ export default function Dashboard() {
     fetchCategories();
   }, []);
 
-  // Fetch produits with filters
+  // Charge les produits selon les filtres actifs
   useEffect(() => {
     const fetchProduits = async () => {
       setLoading(true);
@@ -50,7 +50,7 @@ export default function Dashboard() {
       }
     };
 
-    // Debounce search to avoid too many requests
+    // Debounce de la recherche pour limiter le nombre de requetes
     const timer = setTimeout(fetchProduits, 300);
     return () => clearTimeout(timer);
   }, [search, selectedCategory]);

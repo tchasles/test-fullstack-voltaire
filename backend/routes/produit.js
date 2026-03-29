@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Produit = require('../models/Produit');
 
-// GET /produit/categories — get all unique categories
+// GET /produit/categories — retourne toutes les categories uniques
 router.get('/categories', async (req, res) => {
   try {
     const categories = await Produit.distinct('category');
@@ -19,20 +19,20 @@ router.get('/categories', async (req, res) => {
   }
 });
 
-// GET /produit — fetch all products with optional search by name or category
+// GET /produit — retourne les produits avec filtres optionnels (nom/categorie)
 router.get('/', async (req, res) => {
   try {
     const { search, category } = req.query;
     let query = {};
 
-    // Filter by category if provided
+    // Filtre par categorie si elle est renseignee
     if (category && category !== '') {
       query.category = category;
     }
 
-    // Filter by name (partial match) if search term provided
+    // Filtre par nom (correspondance partielle) si un terme de recherche est present
     if (search && search !== '') {
-      query.name = { $regex: search, $options: 'i' }; // case-insensitive regex
+      query.name = { $regex: search, $options: 'i' }; // regex insensible a la casse
     }
 
     const produits = await Produit.find(query).sort({ id: 1 });

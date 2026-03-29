@@ -1,4 +1,4 @@
-/* ─── Reset & Base ─────────────────────────────────────────────── */
+/* ─── Reinitialisation & Base ──────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -8,7 +8,7 @@ body {
   min-height: 100vh;
 }
 
-/* ─── Auth Pages ────────────────────────────────────────────────── */
+/* ─── Pages d'authentification ─────────────────────────────────── */
 .auth-container {
   display: flex;
   justify-content: center;
@@ -99,7 +99,7 @@ body {
   font-size: 0.875rem;
 }
 
-/* ─── Dashboard ─────────────────────────────────────────────────── */
+/* ─── Tableau de bord ──────────────────────────────────────────── */
 .dashboard {
   min-height: 100vh;
   display: flex;
@@ -156,7 +156,7 @@ body {
   width: 100%;
 }
 
-/* ─── Search Section ────────────────────────────────────────────── */
+/* ─── Section de recherche ─────────────────────────────────────── */
 .search-section {
   display: flex;
   gap: 1rem;
@@ -212,7 +212,7 @@ body {
   background: #616161;
 }
 
-/* ─── Products Container ────────────────────────────────────────── */
+/* ─── Conteneur des produits ───────────────────────────────────── */
 .products-container {
   background: #fff;
   border-radius: 12px;
@@ -314,7 +314,7 @@ body {
   font-size: 0.95rem;
 }
 
-/* ─── Loading ───────────────────────────────────────────────────── */
+/* ─── Chargement ───────────────────────────────────────────────── */
 .loading {
   display: flex;
   justify-content: center;

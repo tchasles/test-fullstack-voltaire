@@ -11,19 +11,19 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://mongo:27017/voltaire';
 
-// Middleware
+// Middlewares
 app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000' }));
 app.use(express.json());
 
-// Routes
+// Routes API
 app.use('/api/auth', authRoutes);
 app.use('/api', protectedRoutes);
 app.use('/api/produit', produitRoutes);
 
-// Health check
+// Point de sante
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
-// Connect to MongoDB then start server
+// Se connecte a MongoDB puis demarre le serveur
 mongoose
   .connect(MONGO_URI)
   .then(() => {

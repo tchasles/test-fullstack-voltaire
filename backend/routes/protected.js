@@ -11,7 +11,7 @@ const apiLimiter = rateLimit({
   message: { message: 'Too many requests, please try again later.' },
 });
 
-// GET /api/me — returns the currently authenticated user's info
+// GET /api/me — retourne les informations de l'utilisateur authentifie
 router.get('/me', apiLimiter, authenticate, (req, res) => {
   res.json({
     user: {
