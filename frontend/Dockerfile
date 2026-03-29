@@ -6,6 +6,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+RUN npm test && printf '\033[32m✓ Frontend tests passed\033[0m\n'
 RUN npm run build
 
 # Etape de production — sert l'application avec nginx

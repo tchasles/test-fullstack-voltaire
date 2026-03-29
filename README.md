@@ -26,7 +26,22 @@ cp .env.example .env   # then edit JWT_SECRET
 docker compose up --build
 ```
 
+During image build, unit tests are executed for both backend and frontend.
+If a test fails, `docker compose build` (or `docker compose up --build`) fails.
+
 The application will be available at **http://localhost/login**.
+
+## Run tests locally
+
+```bash
+# Backend unit tests
+cd backend
+npm test
+
+# Frontend unit tests
+cd ../frontend
+npm test
+```
 
 ## Seed produit data on first run
 
