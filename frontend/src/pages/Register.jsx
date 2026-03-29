@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../services/auth';
 import { useAuth } from '../context/AuthContext';
+import { translateAuthErrorMessage } from '../utils/authMessages';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -23,7 +24,8 @@ export default function Register() {
       await refreshUser();
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      const apiMessage = err.response?.data?.message;
+      setError(translateAuthErrorMessage(apiMessage, "L'inscription a echoue"));
     } finally {
       setSubmitting(false);
     }
@@ -32,12 +34,12 @@ export default function Register() {
   return (
     <div className="auth-container">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h2>Create Account</h2>
+        <h2>Creer un compte</h2>
 
         {error && <p className="error">{error}</p>}
 
         <label>
-          Username
+          Nom d'utilisateur
           <input
             type="text"
             name="username"
@@ -50,7 +52,7 @@ export default function Register() {
         </label>
 
         <label>
-          Email
+          E-mail
           <input
             type="email"
             name="email"
@@ -62,7 +64,7 @@ export default function Register() {
         </label>
 
         <label>
-          Password
+          Mot de passe
           <input
             type="password"
             name="password"
@@ -75,11 +77,11 @@ export default function Register() {
         </label>
 
         <button type="submit" disabled={submitting}>
-          {submitting ? 'Creating account…' : 'Register'}
+          {submitting ? 'Creation du compte...' : "S'inscrire"}
         </button>
 
         <p>
-          Already have an account? <Link to="/login">Sign In</Link>
+          Vous avez deja un compte ? <Link to="/login">Se connecter</Link>
         </p>
       </form>
     </div>

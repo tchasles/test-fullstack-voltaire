@@ -22,7 +22,7 @@ export default function Dashboard() {
           setCategories(response.data.data);
         }
       } catch (err) {
-        console.error('Failed to fetch categories:', err);
+        console.error('Echec du chargement des categories :', err);
       }
     };
     fetchCategories();
@@ -43,8 +43,8 @@ export default function Dashboard() {
           setProduits(response.data.data);
         }
       } catch (err) {
-        console.error('Failed to fetch produits:', err);
-        setError('Failed to load products');
+        console.error('Echec du chargement des produits :', err);
+        setError('Impossible de charger les produits');
       } finally {
         setLoading(false);
       }
@@ -64,11 +64,11 @@ export default function Dashboard() {
     <div className="dashboard">
       <header className="dashboard-header">
         <div className="header-content">
-          <h1>Products Dashboard</h1>
-          <p>Welcome, {user?.username}! 👋</p>
+          <h1>Tableau de bord des produits</h1>
+          <p>Bienvenue, {user?.username} ! 👋</p>
         </div>
         <button onClick={handleLogout} className="logout-btn">
-          Sign Out
+          Se deconnecter
         </button>
       </header>
 
@@ -77,7 +77,7 @@ export default function Dashboard() {
           <div className="search-container">
             <input
               type="text"
-              placeholder="Search by product name..."
+              placeholder="Rechercher par nom de produit..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="search-input"
@@ -87,7 +87,7 @@ export default function Dashboard() {
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="category-select"
             >
-              <option value="">All Categories</option>
+              <option value="">Toutes les categories</option>
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
@@ -103,7 +103,7 @@ export default function Dashboard() {
               }}
               className="clear-btn"
             >
-              Clear Filters
+              Effacer les filtres
             </button>
           )}
         </div>
@@ -111,21 +111,21 @@ export default function Dashboard() {
         {error && <div className="error-message">{error}</div>}
 
         {loading ? (
-          <div className="loading">Loading products...</div>
+          <div className="loading">Chargement des produits...</div>
         ) : (
           <div className="products-container">
             {produits.length === 0 ? (
-              <p className="no-results">No products found.</p>
+              <p className="no-results">Aucun produit trouve.</p>
             ) : (
               <table className="products-table">
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Price</th>
+                    <th>Nom</th>
+                    <th>Categorie</th>
+                    <th>Prix</th>
                     <th>Stock</th>
-                    <th>Created At</th>
+                    <th>Cree le</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -147,7 +147,7 @@ export default function Dashboard() {
               </table>
             )}
             <p className="results-count">
-              Showing {produits.length} product{produits.length !== 1 ? 's' : ''}
+              Affichage de {produits.length} produit{produits.length !== 1 ? 's' : ''}
             </p>
           </div>
         )}

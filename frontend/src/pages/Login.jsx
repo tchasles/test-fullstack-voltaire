@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../services/auth';
 import { useAuth } from '../context/AuthContext';
+import { translateAuthErrorMessage } from '../utils/authMessages';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -23,7 +24,8 @@ export default function Login() {
       await refreshUser();
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      const apiMessage = err.response?.data?.message;
+      setError(translateAuthErrorMessage(apiMessage, 'La connexion a echoue'));
     } finally {
       setSubmitting(false);
     }
@@ -32,12 +34,12 @@ export default function Login() {
   return (
     <div className="auth-container">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h2>Sign In</h2>
+        <h2>Connexion</h2>
 
         {error && <p className="error">{error}</p>}
 
         <label>
-          Email
+          E-mail
           <input
             type="email"
             name="email"
@@ -49,7 +51,7 @@ export default function Login() {
         </label>
 
         <label>
-          Password
+          Mot de passe
           <input
             type="password"
             name="password"
@@ -61,11 +63,11 @@ export default function Login() {
         </label>
 
         <button type="submit" disabled={submitting}>
-          {submitting ? 'Signing in…' : 'Sign In'}
+          {submitting ? 'Connexion en cours...' : 'Se connecter'}
         </button>
 
         <p>
-          No account? <Link to="/register">Register</Link>
+          Pas encore de compte ? <Link to="/register">S'inscrire</Link>
         </p>
       </form>
     </div>
