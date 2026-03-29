@@ -1,215 +1,34 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { api } from '../services/auth';
+import { useDashboard } from '../hooks/useDashboard';
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  const [produits, setProduits] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [deletingId, setDeletingId] = useState(null);
-  const [createError, setCreateError] = useState('');
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editSourceId, setEditSourceId] = useState(null);
-  const [sortBy, setSortBy] = useState(null);
-  const [sortOrder, setSortOrder] = useState('asc');
-  const [newProduit, setNewProduit] = useState({
-    id: '',
-    name: '',
-    category: '',
-    price: '',
-    stock: '',
-  });
-
-  const fetchCategories = useCallback(async () => {
-    try {
-      const response = await api.get('/produit/categories');
-      if (response.data.success) {
-        setCategories(response.data.data);
-      }
-    } catch (err) {
-      console.error('Echec du chargement des categories :', err);
-    }
-  }, []);
-
-  const fetchProduits = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams();
-      if (search) params.append('search', search);
-      if (selectedCategory) params.append('category', selectedCategory);
-
-      const response = await api.get(`/produit?${params.toString()}`);
-      if (response.data.success) {
-        setProduits(response.data.data);
-      }
-    } catch (err) {
-      console.error('Echec du chargement des produits :', err);
-      setError('Impossible de charger les produits');
-    } finally {
-      setLoading(false);
-    }
-  }, [search, selectedCategory]);
-
-  // Charge les categories au montage du composant
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
-
-  // Charge les produits selon les filtres actifs
-  useEffect(() => {
-    // Debounce de la recherche pour limiter le nombre de requetes
-    const timer = setTimeout(fetchProduits, 300);
-    return () => clearTimeout(timer);
-  }, [fetchProduits]);
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
-  const handleCreateInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewProduit((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const resetProductForm = () => {
-    setNewProduit({
-      id: '',
-      name: '',
-      category: '',
-      price: '',
-      stock: '',
-    });
-    setCreateError('');
-    setIsEditMode(false);
-    setEditSourceId(null);
-  };
-
-  const handleOpenCreateForm = () => {
-    if (showCreateForm && !isEditMode) {
-      setShowCreateForm(false);
-      resetProductForm();
-      return;
-    }
-
-    resetProductForm();
-    setShowCreateForm(true);
-  };
-
-  const handleEditProduct = (produit) => {
-    setCreateError('');
-    setIsEditMode(true);
-    setEditSourceId(produit.id);
-    setNewProduit({
-      id: String(produit.id),
-      name: produit.name,
-      category: produit.category,
-      price: String(produit.price),
-      stock: String(produit.stock),
-    });
-    setShowCreateForm(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleSaveProduct = async (e) => {
-    e.preventDefault();
-    setCreateError('');
-    setSaving(true);
-
-    try {
-      const payload = {
-        id: Number(newProduit.id),
-        name: newProduit.name.trim(),
-        category: newProduit.category.trim(),
-        price: Number(newProduit.price),
-        stock: Number(newProduit.stock),
-      };
-
-      if (
-        !Number.isInteger(payload.id) ||
-        !payload.name ||
-        !payload.category ||
-        Number.isNaN(payload.price) ||
-        Number.isNaN(payload.stock)
-      ) {
-        setCreateError('Veuillez renseigner des valeurs valides pour tous les champs.');
-        return;
-      }
-
-      if (isEditMode && editSourceId !== null) {
-        await api.put(`/produit/${editSourceId}`, payload);
-      } else {
-        await api.post('/produit', payload);
-      }
-
-      resetProductForm();
-      setShowCreateForm(false);
-      await Promise.all([fetchProduits(), fetchCategories()]);
-    } catch (err) {
-      const message =
-        err.response?.data?.message ||
-        (isEditMode ? 'Impossible de modifier le produit' : 'Impossible de creer le produit');
-      setCreateError(message);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleSort = (field) => {
-    if (sortBy === field) {
-      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortBy(field);
-      setSortOrder('asc');
-    }
-  };
-
-  // Tri client des produits selon le champ et l'ordre selectionnes
-  const sortedProduits = useMemo(() => {
-    if (!sortBy) return produits;
-    return [...produits].sort((a, b) => {
-      let aVal = a[sortBy];
-      let bVal = b[sortBy];
-      if (sortBy === 'name') {
-        return sortOrder === 'asc'
-          ? aVal.localeCompare(bVal)
-          : bVal.localeCompare(aVal);
-      }
-      if (sortBy === 'created_at') {
-        aVal = new Date(aVal).getTime();
-        bVal = new Date(bVal).getTime();
-      }
-      return sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
-    });
-  }, [produits, sortBy, sortOrder]);
-
-  const handleDeleteProduct = async (id, name) => {
-    const confirmed = window.confirm(
-      `Supprimer le produit ${name} (ID ${id}) ? Cette action est irreversible.`
-    );
-    if (!confirmed) return;
-
-    setError(null);
-    setDeletingId(id);
-    try {
-      await api.delete(`/produit/${id}`);
-      await Promise.all([fetchProduits(), fetchCategories()]);
-    } catch (err) {
-      const message = err.response?.data?.message || 'Impossible de supprimer le produit';
-      setError(message);
-    } finally {
-      setDeletingId(null);
-    }
-  };
+  const {
+    user,
+    categories,
+    search,
+    setSearch,
+    selectedCategory,
+    setSelectedCategory,
+    loading,
+    error,
+    showCreateForm,
+    setShowCreateForm,
+    saving,
+    deletingId,
+    createError,
+    isEditMode,
+    sortBy,
+    sortOrder,
+    newProduit,
+    sortedProduits,
+    handleLogout,
+    handleCreateInputChange,
+    resetProductForm,
+    handleOpenCreateForm,
+    handleEditProduct,
+    handleSaveProduct,
+    handleSort,
+    handleDeleteProduct,
+  } = useDashboard();
 
   return (
     <div className="dashboard">
@@ -343,7 +162,7 @@ export default function Dashboard() {
               </form>
             )}
 
-            {produits.length === 0 ? (
+            {sortedProduits.length === 0 ? (
               <p className="no-results">Aucun produit trouve.</p>
             ) : (
               <table className="products-table">
@@ -420,7 +239,7 @@ export default function Dashboard() {
               </table>
             )}
             <p className="results-count">
-              Affichage de {produits.length} produit{produits.length !== 1 ? 's' : ''}
+              Affichage de {sortedProduits.length} produit{sortedProduits.length !== 1 ? 's' : ''}
             </p>
           </div>
         )}
