@@ -322,6 +322,19 @@ body {
   border-bottom: 2px solid #ddd;
 }
 
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sortable-th:hover {
+  background: #ebebeb;
+}
+
+.sortable-th.sorted {
+  color: #4f8ef7;
+}
+
 .products-table tbody tr {
   border-bottom: 1px solid #eee;
   transition: background-color 0.2s;
