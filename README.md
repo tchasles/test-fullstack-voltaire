@@ -1,26 +1,26 @@
-# Explication du developpeur des choix techniques et technologique
+# Explication du developpeur des choix techniques et technologiques
 
-Dans un premier temps j'ai utilisé Copilot, pour la génération du code, car vu lors de l'entretien précédent j'ai bien compris votre volonté et votre façon de travailler via la génération de code en IA. j'ai donc utilisé Copilot pour la génération du code en controllant la production par incrémentation de petits prompts. J'ai choisi Copilot étant donné que c'est celui que j'utilise déjà et qu'il est permet le setup du projet directement depuis github.
+Dans un premier temps, j'ai utilise Copilot pour la generation du code, car, vu lors de l'entretien precedent, j'ai bien compris votre volonte et votre facon de travailler via la generation de code en IA. J'ai donc utilise Copilot pour la generation du code en controlant la production par incrementation de petits prompts. J'ai choisi Copilot etant donne que c'est celui que j'utilise deja et qu'il permet le setup du projet directement depuis GitHub.
 
-Le cas du projet demandé, ne nécéssite pas une énorme architecture et un build rapide et simple donc j'ai opté pour React + Vite (frontend), Node.JS + Express (backend) avec une bdd utilisant mongoDB + mongoose:
+Le cas du projet demande ne necessite pas une enorme architecture et un build rapide et simple, donc j'ai opte pour React + Vite (frontend), Node.js + Express (backend) avec une BDD utilisant MongoDB + Mongoose :
 
-    - Javascript/Typescript: pour avoir une stack cohérente entre backend et front-end surtout car le backend n'est utilisé que par le backoffice
+    - Javascript/Typescript : pour avoir une stack coherente entre backend et front-end, surtout car le backend n'est utilise que par le backoffice
     
-    -Une architecture full-stack pour permettre un débug plus simple et un projet plus lisible (a ce niveau de complexité)
+    - Une architecture full-stack pour permettre un debug plus simple et un projet plus lisible (a ce niveau de complexite)
     
-    -(mongoDB + mongoose) Simple et rapide à modifié ou évoluer + vu la taille de la donnée pas besoin de plus complexe
+    - (MongoDB + Mongoose) simple et rapide a modifier ou faire evoluer + vu la taille de la donnee, pas besoin de plus complexe
 
-    -(Node.js + Express) adapté pour une API REST, simple au développement et middleware robuste et fourni
+    - (Node.js + Express) adapte pour une API REST, simple au developpement et middleware robuste et fourni
 
-    -(JWt + bcryptjs) a été un choix de Copilot. Un choix que je n'ai pas vu la nécéssité de changer étant une techno déjà utilisé sur un autre projet sur lequel je travaille, bcryptjs est une librairie bien rodée et JWT est simple d'utilisation pour un projet de cette taille.
+    - (JWT + bcryptjs) a ete un choix de Copilot. Un choix dont je n'ai pas vu la necessite de changer, etant une techno deja utilisee sur un autre projet sur lequel je travaille. bcryptjs est une librairie bien rodee et JWT est simple d'utilisation pour un projet de cette taille.
 
-Pour les tests unitaires j'ai laisser le choix a Copilot pour les librairies. Je ne pourrais pas évaluer la qualité de ses choix, n'ayant jamais travaillé sur des test unitaires sur mes projets.
+Pour les tests unitaires, j'ai laisse le choix a Copilot pour les librairies. Je ne pourrais pas evaluer la qualite de ses choix, n'ayant jamais travaille sur des tests unitaires sur mes projets.
 
-Pour les tests unitaires je les ai intégré au build Docker pour que si le test échoue le build échoue par la même occasion, ce qui me permet une meilleure garantie de qualité avant déploiement
+Pour les tests unitaires, je les ai integres au build Docker pour que, si le test echoue, le build echoue par la meme occasion, ce qui me permet une meilleure garantie de qualite avant deploiement.
 
-Finalement le déploiment unique comme demandé, j'ai utilisé Docker pour ce projet, première fois que je l'utilise et très satisfait de son fonctionnement.
+Finalement, pour le deploiement unique comme demande, j'ai utilise Docker pour ce projet. C'est la premiere fois que je l'utilise et je suis tres satisfait de son fonctionnement.
 
-Pour lancer l'app : 
+Pour lancer l'app :
     - Docker Compose activé
     - docker compose up -d --build 
 
