@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/auth';
@@ -18,6 +18,8 @@ export default function Dashboard() {
   const [createError, setCreateError] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
   const [editSourceId, setEditSourceId] = useState(null);
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState('asc');
   const [newProduit, setNewProduit] = useState({
     id: '',
     name: '',
@@ -161,6 +163,34 @@ export default function Dashboard() {
       setSaving(false);
     }
   };
+
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortBy(field);
+      setSortOrder('asc');
+    }
+  };
+
+  // Tri client des produits selon le champ et l'ordre selectionnes
+  const sortedProduits = useMemo(() => {
+    if (!sortBy) return produits;
+    return [...produits].sort((a, b) => {
+      let aVal = a[sortBy];
+      let bVal = b[sortBy];
+      if (sortBy === 'name') {
+        return sortOrder === 'asc'
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal);
+      }
+      if (sortBy === 'created_at') {
+        aVal = new Date(aVal).getTime();
+        bVal = new Date(bVal).getTime();
+      }
+      return sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
+    });
+  }, [produits, sortBy, sortOrder]);
 
   const handleDeleteProduct = async (id, name) => {
     const confirmed = window.confirm(
@@ -320,16 +350,36 @@ export default function Dashboard() {
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Nom</th>
+                    <th
+                      className={`sortable-th${sortBy === 'name' ? ' sorted' : ''}`}
+                      onClick={() => handleSort('name')}
+                    >
+                      Nom {sortBy === 'name' ? (sortOrder === 'asc' ? '▲' : '▼') : '⇅'}
+                    </th>
                     <th>Categorie</th>
-                    <th>Prix</th>
-                    <th>Stock</th>
-                    <th>Cree le</th>
+                    <th
+                      className={`sortable-th${sortBy === 'price' ? ' sorted' : ''}`}
+                      onClick={() => handleSort('price')}
+                    >
+                      Prix {sortBy === 'price' ? (sortOrder === 'asc' ? '▲' : '▼') : '⇅'}
+                    </th>
+                    <th
+                      className={`sortable-th${sortBy === 'stock' ? ' sorted' : ''}`}
+                      onClick={() => handleSort('stock')}
+                    >
+                      Stock {sortBy === 'stock' ? (sortOrder === 'asc' ? '▲' : '▼') : '⇅'}
+                    </th>
+                    <th
+                      className={`sortable-th${sortBy === 'created_at' ? ' sorted' : ''}`}
+                      onClick={() => handleSort('created_at')}
+                    >
+                      Cree le {sortBy === 'created_at' ? (sortOrder === 'asc' ? '▲' : '▼') : '⇅'}
+                    </th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {produits.map((produit) => (
+                  {sortedProduits.map((produit) => (
                     <tr key={produit._id} className="product-row">
                       <td>{produit.id}</td>
                       <td className="product-name">{produit.name}</td>
