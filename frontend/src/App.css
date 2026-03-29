@@ -279,7 +279,22 @@ body {
   padding: 0.65rem 0.9rem;
 }
 
+.cancel-create-btn {
+  border: 1px solid #cfd8dc;
+  border-radius: 8px;
+  background: #fff;
+  color: #37474f;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.65rem 0.9rem;
+}
+
 .submit-create-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.cancel-create-btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
@@ -357,6 +372,26 @@ body {
 .product-date {
   font-size: 0.9rem;
   color: #666;
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-btn {
+  border: none;
+  border-radius: 8px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  cursor: pointer;
+  width: 34px;
+  height: 34px;
+  font-size: 1rem;
+}
+
+.edit-btn:hover {
+  background: #c8e6c9;
 }
 
 .delete-btn {
