@@ -70,6 +70,12 @@ The seed script inserts documents into the `produit` collection and creates a un
 | POST   | `/api/auth/register`  | No            | Register a new user      |
 | POST   | `/api/auth/login`     | No            | Login, receive JWT token |
 | GET    | `/api/me`             | Yes (Bearer)  | Get current user info    |
+| GET    | `/api/produit`        | No            | List products (optional `search`, `category`) |
+| GET    | `/api/produit/:id`    | No            | Get a specific product by numeric id |
+| GET    | `/api/produit/categories` | No        | Get all distinct product categories |
+| POST   | `/api/produit`        | No            | Create a new product |
+| PUT    | `/api/produit/:id`    | No            | Update an existing product |
+| DELETE | `/api/produit/:id`    | No            | Delete a product |
 | GET    | `/health`             | No            | Backend health check     |
 
 ## Project structure
