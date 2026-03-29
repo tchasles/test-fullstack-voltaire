@@ -16,6 +16,8 @@ export default function Dashboard() {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [createError, setCreateError] = useState('');
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editSourceId, setEditSourceId] = useState(null);
   const [newProduit, setNewProduit] = useState({
     id: '',
     name: '',
@@ -77,7 +79,46 @@ export default function Dashboard() {
     setNewProduit((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCreateProduct = async (e) => {
+  const resetProductForm = () => {
+    setNewProduit({
+      id: '',
+      name: '',
+      category: '',
+      price: '',
+      stock: '',
+    });
+    setCreateError('');
+    setIsEditMode(false);
+    setEditSourceId(null);
+  };
+
+  const handleOpenCreateForm = () => {
+    if (showCreateForm && !isEditMode) {
+      setShowCreateForm(false);
+      resetProductForm();
+      return;
+    }
+
+    resetProductForm();
+    setShowCreateForm(true);
+  };
+
+  const handleEditProduct = (produit) => {
+    setCreateError('');
+    setIsEditMode(true);
+    setEditSourceId(produit.id);
+    setNewProduit({
+      id: String(produit.id),
+      name: produit.name,
+      category: produit.category,
+      price: String(produit.price),
+      stock: String(produit.stock),
+    });
+    setShowCreateForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSaveProduct = async (e) => {
     e.preventDefault();
     setCreateError('');
     setSaving(true);
@@ -102,19 +143,19 @@ export default function Dashboard() {
         return;
       }
 
-      await api.post('/produit', payload);
+      if (isEditMode && editSourceId !== null) {
+        await api.put(`/produit/${editSourceId}`, payload);
+      } else {
+        await api.post('/produit', payload);
+      }
 
-      setNewProduit({
-        id: '',
-        name: '',
-        category: '',
-        price: '',
-        stock: '',
-      });
+      resetProductForm();
       setShowCreateForm(false);
       await Promise.all([fetchProduits(), fetchCategories()]);
     } catch (err) {
-      const message = err.response?.data?.message || 'Impossible de creer le produit';
+      const message =
+        err.response?.data?.message ||
+        (isEditMode ? 'Impossible de modifier le produit' : 'Impossible de creer le produit');
       setCreateError(message);
     } finally {
       setSaving(false);
@@ -199,18 +240,16 @@ export default function Dashboard() {
               <button
                 type="button"
                 className="add-product-btn"
-                onClick={() => {
-                  setCreateError('');
-                  setShowCreateForm((prev) => !prev);
-                }}
+                onClick={handleOpenCreateForm}
                 aria-label="Ajouter un produit"
+                title="Ajouter"
               >
                 +
               </button>
             </div>
 
             {showCreateForm && (
-              <form className="create-product-form" onSubmit={handleCreateProduct}>
+              <form className="create-product-form" onSubmit={handleSaveProduct}>
                 <input
                   type="number"
                   name="id"
@@ -257,7 +296,18 @@ export default function Dashboard() {
                   required
                 />
                 <button type="submit" className="submit-create-btn" disabled={saving}>
-                  {saving ? 'Ajout...' : 'Ajouter'}
+                  {saving ? 'Enregistrement...' : isEditMode ? 'Enregistrer' : 'Ajouter'}
+                </button>
+                <button
+                  type="button"
+                  className="cancel-create-btn"
+                  onClick={() => {
+                    setShowCreateForm(false);
+                    resetProductForm();
+                  }}
+                  disabled={saving}
+                >
+                  Annuler
                 </button>
                 {createError && <p className="create-error-message">{createError}</p>}
               </form>
@@ -292,16 +342,27 @@ export default function Dashboard() {
                         {new Date(produit.created_at).toLocaleDateString()}
                       </td>
                       <td>
-                        <button
-                          type="button"
-                          className="delete-btn"
-                          onClick={() => handleDeleteProduct(produit.id, produit.name)}
-                          disabled={deletingId === produit.id}
-                          aria-label={`Supprimer ${produit.name}`}
-                          title="Supprimer"
-                        >
-                          {deletingId === produit.id ? '...' : '🗑'}
-                        </button>
+                        <div className="row-actions">
+                          <button
+                            type="button"
+                            className="edit-btn"
+                            onClick={() => handleEditProduct(produit)}
+                            aria-label={`Modifier ${produit.name}`}
+                            title="Modifier"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            type="button"
+                            className="delete-btn"
+                            onClick={() => handleDeleteProduct(produit.id, produit.name)}
+                            disabled={deletingId === produit.id}
+                            aria-label={`Supprimer ${produit.name}`}
+                            title="Supprimer"
+                          >
+                            {deletingId === produit.id ? '...' : '🗑'}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
