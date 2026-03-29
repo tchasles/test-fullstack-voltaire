@@ -12,7 +12,7 @@ const authLimiter = rateLimit({
   message: { message: 'Too many requests, please try again later.' },
 });
 
-// POST /api/auth/register
+// POST /api/auth/register — cree un nouvel utilisateur
 router.post('/register', authLimiter, async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -38,7 +38,7 @@ router.post('/register', authLimiter, async (req, res) => {
   }
 });
 
-// POST /api/auth/login
+// POST /api/auth/login — connecte un utilisateur existant
 router.post('/login', authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;

@@ -4,12 +4,12 @@ const API_URL = '/api';
 
 const TOKEN_KEY = 'voltaire_token';
 
-// Axios instance with auth headers
+// Instance Axios utilisee pour les appels API
 const api = axios.create({
   baseURL: API_URL,
 });
 
-// Add token to all requests
+// Ajoute automatiquement le jeton a chaque requete
 api.interceptors.request.use((config) => {
   const token = getToken();
   if (token) {
