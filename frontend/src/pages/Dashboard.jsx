@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/auth';
@@ -12,52 +12,132 @@ export default function Dashboard() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [createError, setCreateError] = useState('');
+  const [newProduit, setNewProduit] = useState({
+    id: '',
+    name: '',
+    category: '',
+    price: '',
+    stock: '',
+  });
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await api.get('/produit/categories');
+      if (response.data.success) {
+        setCategories(response.data.data);
+      }
+    } catch (err) {
+      console.error('Echec du chargement des categories :', err);
+    }
+  }, []);
+
+  const fetchProduits = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      if (selectedCategory) params.append('category', selectedCategory);
+
+      const response = await api.get(`/produit?${params.toString()}`);
+      if (response.data.success) {
+        setProduits(response.data.data);
+      }
+    } catch (err) {
+      console.error('Echec du chargement des produits :', err);
+      setError('Impossible de charger les produits');
+    } finally {
+      setLoading(false);
+    }
+  }, [search, selectedCategory]);
 
   // Charge les categories au montage du composant
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await api.get('/produit/categories');
-        if (response.data.success) {
-          setCategories(response.data.data);
-        }
-      } catch (err) {
-        console.error('Echec du chargement des categories :', err);
-      }
-    };
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   // Charge les produits selon les filtres actifs
   useEffect(() => {
-    const fetchProduits = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const params = new URLSearchParams();
-        if (search) params.append('search', search);
-        if (selectedCategory) params.append('category', selectedCategory);
-
-        const response = await api.get(`/produit?${params.toString()}`);
-        if (response.data.success) {
-          setProduits(response.data.data);
-        }
-      } catch (err) {
-        console.error('Echec du chargement des produits :', err);
-        setError('Impossible de charger les produits');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     // Debounce de la recherche pour limiter le nombre de requetes
     const timer = setTimeout(fetchProduits, 300);
     return () => clearTimeout(timer);
-  }, [search, selectedCategory]);
+  }, [fetchProduits]);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleCreateInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewProduit((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCreateProduct = async (e) => {
+    e.preventDefault();
+    setCreateError('');
+    setSaving(true);
+
+    try {
+      const payload = {
+        id: Number(newProduit.id),
+        name: newProduit.name.trim(),
+        category: newProduit.category.trim(),
+        price: Number(newProduit.price),
+        stock: Number(newProduit.stock),
+      };
+
+      if (
+        !Number.isInteger(payload.id) ||
+        !payload.name ||
+        !payload.category ||
+        Number.isNaN(payload.price) ||
+        Number.isNaN(payload.stock)
+      ) {
+        setCreateError('Veuillez renseigner des valeurs valides pour tous les champs.');
+        return;
+      }
+
+      await api.post('/produit', payload);
+
+      setNewProduit({
+        id: '',
+        name: '',
+        category: '',
+        price: '',
+        stock: '',
+      });
+      setShowCreateForm(false);
+      await Promise.all([fetchProduits(), fetchCategories()]);
+    } catch (err) {
+      const message = err.response?.data?.message || 'Impossible de creer le produit';
+      setCreateError(message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteProduct = async (id, name) => {
+    const confirmed = window.confirm(
+      `Supprimer le produit ${name} (ID ${id}) ? Cette action est irreversible.`
+    );
+    if (!confirmed) return;
+
+    setError(null);
+    setDeletingId(id);
+    try {
+      await api.delete(`/produit/${id}`);
+      await Promise.all([fetchProduits(), fetchCategories()]);
+    } catch (err) {
+      const message = err.response?.data?.message || 'Impossible de supprimer le produit';
+      setError(message);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -114,6 +194,75 @@ export default function Dashboard() {
           <div className="loading">Chargement des produits...</div>
         ) : (
           <div className="products-container">
+            <div className="products-toolbar">
+              <h2>Liste des produits</h2>
+              <button
+                type="button"
+                className="add-product-btn"
+                onClick={() => {
+                  setCreateError('');
+                  setShowCreateForm((prev) => !prev);
+                }}
+                aria-label="Ajouter un produit"
+              >
+                +
+              </button>
+            </div>
+
+            {showCreateForm && (
+              <form className="create-product-form" onSubmit={handleCreateProduct}>
+                <input
+                  type="number"
+                  name="id"
+                  placeholder="ID"
+                  value={newProduit.id}
+                  onChange={handleCreateInputChange}
+                  min="1"
+                  required
+                />
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Nom"
+                  value={newProduit.name}
+                  onChange={handleCreateInputChange}
+                  required
+                />
+                <input
+                  type="text"
+                  name="category"
+                  placeholder="Categorie"
+                  value={newProduit.category}
+                  onChange={handleCreateInputChange}
+                  required
+                />
+                <input
+                  type="number"
+                  name="price"
+                  placeholder="Prix"
+                  value={newProduit.price}
+                  onChange={handleCreateInputChange}
+                  min="0"
+                  step="0.01"
+                  required
+                />
+                <input
+                  type="number"
+                  name="stock"
+                  placeholder="Stock"
+                  value={newProduit.stock}
+                  onChange={handleCreateInputChange}
+                  min="0"
+                  step="1"
+                  required
+                />
+                <button type="submit" className="submit-create-btn" disabled={saving}>
+                  {saving ? 'Ajout...' : 'Ajouter'}
+                </button>
+                {createError && <p className="create-error-message">{createError}</p>}
+              </form>
+            )}
+
             {produits.length === 0 ? (
               <p className="no-results">Aucun produit trouve.</p>
             ) : (
@@ -126,6 +275,7 @@ export default function Dashboard() {
                     <th>Prix</th>
                     <th>Stock</th>
                     <th>Cree le</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -140,6 +290,18 @@ export default function Dashboard() {
                       </td>
                       <td className="product-date">
                         {new Date(produit.created_at).toLocaleDateString()}
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="delete-btn"
+                          onClick={() => handleDeleteProduct(produit.id, produit.name)}
+                          disabled={deletingId === produit.id}
+                          aria-label={`Supprimer ${produit.name}`}
+                          title="Supprimer"
+                        >
+                          {deletingId === produit.id ? '...' : '🗑'}
+                        </button>
                       </td>
                     </tr>
                   ))}
